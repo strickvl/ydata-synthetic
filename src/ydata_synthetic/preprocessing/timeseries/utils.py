@@ -30,7 +30,5 @@ def real_data_loading(data: np.array, seq_len):
 
     # Mix the datasets (to make it similar to i.i.d)
     idx = np.random.permutation(len(temp_data))
-    data = []
-    for i in range(len(temp_data)):
-        data.append(temp_data[idx[i]])
+    data = [temp_data[idx[i]] for i in range(len(temp_data))]
     return data

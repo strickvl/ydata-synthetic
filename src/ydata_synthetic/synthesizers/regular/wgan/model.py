@@ -146,7 +146,10 @@ class WGAN(BaseModel):
                     # save model checkpoints
                     if path.exists('./cache') is False:
                         mkdir('./cache')
-                    model_checkpoint_base_name = './cache/' + train_arguments.cache_prefix + '_{}_model_weights_step_{}.h5'
+                    model_checkpoint_base_name = (
+                        f'./cache/{train_arguments.cache_prefix}'
+                        + '_{}_model_weights_step_{}.h5'
+                    )
                     self.generator.save_weights(model_checkpoint_base_name.format('generator', epoch))
                     self.critic.save_weights(model_checkpoint_base_name.format('critic', epoch))
 

@@ -131,7 +131,7 @@ class BaseModel():
     def save(self, path):
         "Saves the pickled synthesizer instance in the given path."
         #Save only the generator?
-        if self.__MODEL__=='WGAN' or self.__MODEL__=='WGAN_GP' or self.__MODEL__=='CWGAN_GP':
+        if self.__MODEL__ in ['WGAN', 'WGAN_GP', 'CWGAN_GP']:
             del self.critic
         make_keras_picklable()
         dump(self, path)
@@ -146,5 +146,4 @@ class BaseModel():
             except (ValueError, RuntimeError):
                 # Invalid device or cannot modify virtual devices once initialized.
                 pass
-        synth = load(path)
-        return synth
+        return load(path)

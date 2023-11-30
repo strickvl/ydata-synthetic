@@ -37,8 +37,7 @@ class DRAGAN(BaseModel):
         return g_optimizer, d_optimizer
 
     def gradient_penalty(self, real, fake):
-        gp = gradient_penalty(self.discriminator, real, fake, mode= Mode.DRAGAN)
-        return gp
+        return gradient_penalty(self.discriminator, real, fake, mode= Mode.DRAGAN)
 
     def update_gradients(self, x, g_optimizer, d_optimizer):
         """
@@ -86,11 +85,11 @@ class DRAGAN(BaseModel):
         # gradient penalty
         gp = self.gradient_penalty(real, fake)
 
-        # getting the loss of the discriminator.
-        d_loss = (tf.reduce_mean(logits_fake)
-                  - tf.reduce_mean(logits_real)
-                  + gp * self.gradient_penalty_weight)
-        return d_loss
+        return (
+            tf.reduce_mean(logits_fake)
+            - tf.reduce_mean(logits_real)
+            + gp * self.gradient_penalty_weight
+        )
 
     # generator loss
     def g_lossfn(self, real):
@@ -104,15 +103,15 @@ class DRAGAN(BaseModel):
 
         fake = self.generator(noise, training=True)
         logits_fake = self.discriminator(fake, training=True)
-        g_loss = -tf.reduce_mean(logits_fake)
-        return g_loss
+        return -tf.reduce_mean(logits_fake)
 
     def get_data_batch(self, train, batch_size):
         buffer_size = len(train)
-        #tensor_data = pd.concat([x_train, y_train], axis=1)
-        train_loader = tf.data.Dataset.from_tensor_slices(train) \
-            .batch(batch_size).shuffle(buffer_size)
-        return train_loader
+        return (
+            tf.data.Dataset.from_tensor_slices(train)
+            .batch(batch_size)
+            .shuffle(buffer_size)
+        )
 
     def train_step(self, train_data, optimizers):
         d_loss, g_loss = self.update_gradients(train_data, *optimizers)
@@ -143,17 +142,17 @@ class DRAGAN(BaseModel):
                     batch_data = tf.cast(batch_data, dtype=tf.float32)
                     d_loss, g_loss = self.train_step(batch_data, optimizers)
 
-                print(
-                    "Epoch: {} | disc_loss: {} | gen_loss: {}".format(
-                        epoch, d_loss, g_loss
-                    ))
+                print(f"Epoch: {epoch} | disc_loss: {d_loss} | gen_loss: {g_loss}")
 
                 if epoch % train_arguments.sample_interval == 0:
                     # Test here data generation step
                     # save model checkpoints
                     if path.exists('./cache') is False:
                         os.mkdir('./cache')
-                    model_checkpoint_base_name = './cache/' + train_arguments.cache_prefix + '_{}_model_weights_step_{}.h5'
+                    model_checkpoint_base_name = (
+                        f'./cache/{train_arguments.cache_prefix}'
+                        + '_{}_model_weights_step_{}.h5'
+                    )
                     self.generator.save_weights(model_checkpoint_base_name.format('generator', epoch))
                     self.discriminator.save_weights(model_checkpoint_base_name.format('discriminator', epoch))
 

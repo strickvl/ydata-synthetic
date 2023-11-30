@@ -57,8 +57,7 @@ class CWGANGP(CGAN, WGAN_GP):
             d_hat = self.critic([x_hat, label])
         gradients = t.gradient(d_hat, x_hat)
         ddx = sqrt(reduce_sum(gradients ** 2))
-        d_regularizer = reduce_mean((ddx - 1.0) ** 2)
-        return d_regularizer
+        return reduce_mean((ddx - 1.0) ** 2)
 
     @staticmethod
     def get_data_batch(data, batch_size, seed=0):
@@ -84,11 +83,11 @@ class CWGANGP(CGAN, WGAN_GP):
 
         # gradient penalty
         gp = self.gradient_penalty(real, fake, label)
-        # getting the loss of the critic.
-        c_loss = (reduce_mean(logits_fake)
-                  - reduce_mean(logits_real)
-                  + gp * self.gradient_penalty_weight)
-        return c_loss
+        return (
+            reduce_mean(logits_fake)
+            - reduce_mean(logits_real)
+            + gp * self.gradient_penalty_weight
+        )
 
     def g_lossfn(self, real):
         """
@@ -104,8 +103,7 @@ class CWGANGP(CGAN, WGAN_GP):
 
         fake = self.generator([noise, label])
         logits_fake = self.critic([fake, label])
-        g_loss = -reduce_mean(logits_fake)
-        return g_loss
+        return -reduce_mean(logits_fake)
 
     def train(self, data: DataFrame, label_col: str, train_arguments: TrainParameters, num_cols: List[str],
               cat_cols: List[str]):
@@ -148,10 +146,7 @@ class CWGANGP(CGAN, WGAN_GP):
 
                 cri_loss, ge_loss = self.train_step((batch_x, label), optimizers)
 
-            print(
-                "Epoch: {} | critic_loss: {} | gen_loss: {}".format(
-                    epoch, cri_loss, ge_loss
-                ))
+            print(f"Epoch: {epoch} | critic_loss: {cri_loss} | gen_loss: {ge_loss}")
 
             # If at save interval => save model state and generated image samples
             if epoch % train_arguments.sample_interval == 0:

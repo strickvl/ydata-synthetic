@@ -82,8 +82,12 @@ class BaseProcessor(ABC, BaseEstimator, TransformerMixin):
         Assertion errors are raised in case any of the tests fails."""
         missing = set(x_cols).difference(set(self.num_cols).union(set(self.cat_cols)))
         intersection = set(self.num_cols).intersection(set(self.cat_cols))
-        assert intersection == set(), f"num_cols and cat_cols share columns {intersection} but should be disjoint."
-        assert missing == set(), f"The columns {missing} of the provided dataset were not attributed to a pipeline."
+        assert (
+            not intersection
+        ), f"num_cols and cat_cols share columns {intersection} but should be disjoint."
+        assert (
+            not missing
+        ), f"The columns {missing} of the provided dataset were not attributed to a pipeline."
 
     # pylint: disable=C0103
     @abstractmethod

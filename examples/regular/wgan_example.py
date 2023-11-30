@@ -16,14 +16,16 @@ data = pd.read_csv('data/creditcard.csv', index_col=[0])
 num_cols = list(data.columns[ data.columns != 'Class' ])
 cat_cols = ['Class']
 
-print('Dataset columns: {}'.format(num_cols))
+print(f'Dataset columns: {num_cols}')
 sorted_cols = ['V14', 'V4', 'V10', 'V17', 'V12', 'V26', 'Amount', 'V21', 'V8', 'V11', 'V7', 'V28', 'V19', 'V3', 'V22', 'V6', 'V20', 'V27', 'V16', 'V13', 'V25', 'V24', 'V18', 'V2', 'V1', 'V5', 'V15', 'V9', 'V23', 'Class']
 processed_data = data[ sorted_cols ].copy()
 
 #For the purpose of this example we will only synthesize the minority class
 train_data = data.loc[ data['Class']==1 ].copy()
 
-print("Dataset info: Number of records - {} Number of variables - {}".format(train_data.shape[0], train_data.shape[1]))
+print(
+    f"Dataset info: Number of records - {train_data.shape[0]} Number of variables - {train_data.shape[1]}"
+)
 algorithm = cluster.KMeans
 args, kwds = (), {'n_clusters':2, 'random_state':0}
 labels = algorithm(*args, **kwds).fit_predict(train_data[ num_cols ])

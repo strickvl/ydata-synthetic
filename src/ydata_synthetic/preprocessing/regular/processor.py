@@ -88,9 +88,7 @@ class RegularDataProcessor(BaseProcessor):
         num_data = self.num_pipeline.transform(X[self.num_cols]) if self.num_cols else zeros([len(X), 0])
         cat_data = self.cat_pipeline.transform(X[self.cat_cols]) if self.cat_cols else zeros([len(X), 0])
 
-        transformed = concatenate([num_data, cat_data], axis=1)
-
-        return transformed
+        return concatenate([num_data, cat_data], axis=1)
 
     def inverse_transform(self, X: ndarray) -> DataFrame:
         """Inverts the data transformation pipelines on a passed DataFrame.

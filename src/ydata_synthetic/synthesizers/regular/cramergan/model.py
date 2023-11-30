@@ -46,8 +46,7 @@ class CRAMERGAN(BaseModel):
         return g_optimizer, c_optimizer
 
     def gradient_penalty(self, real, fake):
-        gp = gradient_penalty(self.f_crit, real, fake, mode=Mode.CRAMER)
-        return gp
+        return gradient_penalty(self.f_crit, real, fake, mode=Mode.CRAMER)
 
     def update_gradients(self, x, g_optimizer, c_optimizer):
         """Compute and apply the gradients for both the Generator and the Critic.
@@ -167,7 +166,10 @@ class CRAMERGAN(BaseModel):
                         # save model checkpoints
                         if path.exists('./cache') is False:
                             os.mkdir('./cache')
-                        model_checkpoint_base_name = './cache/' + train_arguments.cache_prefix + '_{}_model_weights_step_{}.h5'
+                        model_checkpoint_base_name = (
+                            f'./cache/{train_arguments.cache_prefix}'
+                            + '_{}_model_weights_step_{}.h5'
+                        )
                         self.generator.save_weights(model_checkpoint_base_name.format('generator', iteration))
                         self.critic.save_weights(model_checkpoint_base_name.format('critic', iteration))
                 print(f"Epoch: {epoch} | critic_loss: {c_loss} | gen_loss: {g_loss}")

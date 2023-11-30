@@ -63,7 +63,13 @@ def test_fit_transform(regular_data_processor, regular_data_example):
     assert regular_data_processor._check_is_fitted() is None
     assert transformed.shape[0] == regular_data_example.shape[0]
     assert transformed.shape[1] != regular_data_example.shape[1]
-    assert all([isinstance(idx, int) for idx in [regular_data_processor._num_col_idx_, regular_data_processor._cat_col_idx_]])
+    assert all(
+        isinstance(idx, int)
+        for idx in [
+            regular_data_processor._num_col_idx_,
+            regular_data_processor._cat_col_idx_,
+        ]
+    )
     assert isinstance(transformed, ndarray)
 
 def test_inverse_transform(regular_data_processor, regular_data_example):

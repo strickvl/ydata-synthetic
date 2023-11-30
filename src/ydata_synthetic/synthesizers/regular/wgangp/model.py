@@ -45,8 +45,7 @@ class WGAN_GP(BaseModel):
             d_hat = self.critic(x_hat)
         gradients = t.gradient(d_hat, x_hat)
         ddx = tf.sqrt(tf.reduce_sum(gradients ** 2))
-        d_regularizer = tf.reduce_mean((ddx - 1.0) ** 2)
-        return d_regularizer
+        return tf.reduce_mean((ddx - 1.0) ** 2)
 
     def update_gradients(self, x, g_optimizer, c_optimizer):
         """
@@ -93,11 +92,11 @@ class WGAN_GP(BaseModel):
 
         # gradient penalty
         gp = self.gradient_penalty(real, fake)
-        # getting the loss of the critic.
-        c_loss = (tf.reduce_mean(logits_fake)
-                  - tf.reduce_mean(logits_real)
-                  + gp * self.gradient_penalty_weight)
-        return c_loss
+        return (
+            tf.reduce_mean(logits_fake)
+            - tf.reduce_mean(logits_real)
+            + gp * self.gradient_penalty_weight
+        )
 
     def g_lossfn(self, real):
         """
@@ -109,8 +108,7 @@ class WGAN_GP(BaseModel):
 
         fake = self.generator(noise)
         logits_fake = self.critic(fake)
-        g_loss = -tf.reduce_mean(logits_fake)
-        return g_loss
+        return -tf.reduce_mean(logits_fake)
 
     def get_data_batch(self, train, batch_size, seed=0):
         # np.random.seed(seed)
@@ -154,17 +152,17 @@ class WGAN_GP(BaseModel):
                     batch_data = self.get_data_batch(processed_data, self.batch_size).astype(np.float32)
                     cri_loss, ge_loss = self.train_step(batch_data, optimizers)
 
-                print(
-                    "Epoch: {} | disc_loss: {} | gen_loss: {}".format(
-                        epoch, cri_loss, ge_loss
-                    ))
+                print(f"Epoch: {epoch} | disc_loss: {cri_loss} | gen_loss: {ge_loss}")
 
                 if epoch % train_arguments.sample_interval == 0:
                     # Test here data generation step
                     # save model checkpoints
                     if path.exists('./cache') is False:
                         os.mkdir('./cache')
-                    model_checkpoint_base_name = './cache/' + train_arguments.cache_prefix + '_{}_model_weights_step_{}.h5'
+                    model_checkpoint_base_name = (
+                        f'./cache/{train_arguments.cache_prefix}'
+                        + '_{}_model_weights_step_{}.h5'
+                    )
                     self.generator.save_weights(model_checkpoint_base_name.format('generator', epoch))
                     self.critic.save_weights(model_checkpoint_base_name.format('critic', epoch))
 
